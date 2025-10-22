@@ -24,7 +24,7 @@ class IITA_Dataset():
     def __init__(self, filename, nan_vals=[], separator=',', excel_sheet_id=0):
         """
         Initializes a list of response patterns from a file, along with computing the counterexample numbers for implications\n
-        Supports all pandas-readable datatypes\n
+        Supports all pandas-readable datatypes and .npy\n
         Rows must represent the respondents, columns - the items\n
         Values in nan_vals get replaced by NaN in the data\n
         """
@@ -40,6 +40,10 @@ class IITA_Dataset():
         #response pattern reading
         if (filename[-3:] == 'xls' or filename[-4:] == 'xlsx'):
             self.rp = pd.read_excel(filename, sheet_name=excel_sheet_id, header=None, na_values=nan_vals)
+        elif (filename[-3:] == 'npy'):
+            self.rp = pd.DataFrame(np.load(filename))
+
+            self.rp[self.rp in nan_vals] = np.nan
         else:
             self.rp = pd.read_table(filename, sep=separator, header=None, na_values=nan_vals)
         
