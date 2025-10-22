@@ -72,3 +72,17 @@ class IITA_Dataset():
             #for respondent i, increment all cases where a=b (examples of equivalence of a and b)
             row = self.rp.loc[i]
             self.eqe.loc[np.equal.outer(row, row)] += 1
+    
+    def add(self, dataset_to_add):
+        """
+        Add a second IITA_Dataset: concatenate the response patterns, add counterexamples and equivalence examples\n
+        Item amounts must match, else ValueError
+        """
+        if (len(self.rp) != len(dataset_to_add.rp)):
+            raise ValueError('Item amounts must match')
+        
+        self.rp = pd.concat(self.rp, dataset_to_add.rp)
+        self.ce = self.ce + dataset_to_add.ce
+        self.eqe = self.eqe + dataset_to_add.eqe
+    
+    __iadd__ = add
