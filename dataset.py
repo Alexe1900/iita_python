@@ -21,15 +21,26 @@ class IITA_Dataset():
         self._ce = inp
     counterexamples = ce
 
+    #to use both equiv_examples and eqe
+    @property
+    def eqe(self):
+        return self._eqe
+    @ce.setter
+    def eqe(self, inp):
+        self._eqe = inp
+    equiv_examples = eqe
+
     def __init__(self, filename, nan_vals=[], separator=',', excel_sheet_id=0):
         """
-        Initializes a list of response patterns from a file, along with computing the counterexample numbers for implications\n
+        Initializes a list of response patterns from a file,
+        along with computing the counterexamples and equivalence examples\n
         Supports all pandas-readable datatypes and .npy\n
         Rows must represent the respondents, columns - the items\n
         Values in nan_vals get replaced by NaN in the data\n
         """
         self._rp = None
         self._ce = None
+        self._eqe = None
 
         #filename checks
         if (not os.path.isfile(filename)):
@@ -47,7 +58,7 @@ class IITA_Dataset():
         else:
             self.rp = pd.read_table(filename, sep=separator, header=None, na_values=nan_vals)
         
-        #counterexamples computation        
+        #counterexamples computation   
         self.ce = pd.DataFrame(0, index=np.arange(len(self.rp)), columns=np.arange(len(self.rp)))
 
         for i in range(len(self.rp)):
@@ -55,3 +66,9 @@ class IITA_Dataset():
             a = self.rp.loc[i] == 1
             not_b = self.rp.loc[i] == 0
             self.ce.loc[a, not_b] += 1
+        
+        #equivalence examples computation   
+        for i in range(len(self.rp)):
+            #for respondent i, increment all cases where a=b (examples of equivalence of a and b)
+            row = self.rp.loc[i]
+            self.eqe.loc[np.equal.outer(row, row)] += 1
