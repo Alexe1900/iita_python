@@ -23,13 +23,13 @@ def read_rp(
     
     #response pattern reading
     rp = None
-    if (filename[-3:] == 'xls' or filename[-4:] == 'xlsx'):
+    if (filename[-3:] == 'xls' or filename[-4:] == 'xlsx'): #excel
         rp = pd.read_excel(filename, sheet_name=excel_sheet_id, header=None, na_values=nan_vals)
-    elif (filename[-3:] == 'npy'):
+    elif (filename[-3:] == 'npy'): #npy
         rp = pd.DataFrame(np.load(filename))
 
         rp[rp in nan_vals] = np.nan
-    else:
+    else: #sonstiges
         rp = pd.read_table(filename, sep=separator, header=None, na_values=nan_vals)
     
     return rp

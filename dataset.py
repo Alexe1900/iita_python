@@ -1,11 +1,11 @@
 import numpy as np
 import numpy.typing as npt
-from typing import Self
+from typing import Self, List
 import pandas as pd
 import os
 
 class IITA_Dataset():
-    #to use both response_patterns and rp
+    #aliases for response_patterns, counterexamples, equiv_examples
     @property
     def rp(self) -> pd.DataFrame:
         return self._rp
@@ -14,7 +14,6 @@ class IITA_Dataset():
         self._rp = inp
     response_patterns = rp
 
-    #to use both counterexamples and ce
     @property
     def ce(self) -> pd.DataFrame:
         return self._ce
@@ -23,7 +22,6 @@ class IITA_Dataset():
         self._ce = inp
     counterexamples = ce
 
-    #to use both equiv_examples and eqe
     @property
     def eqe(self) -> pd.DataFrame:
         return self._eqe
@@ -32,7 +30,7 @@ class IITA_Dataset():
         self._eqe = inp
     equiv_examples = eqe
 
-    def __init__(self, response_patterns: pd.DataFrame | npt.NDArray):
+    def __init__(self, response_patterns: pd.DataFrame | npt.NDArray | List[List[int]]):
         """
         Computes the counterexamples and equivalence examples from response patterns\n
         Supports pandas dataframes, numpy arrays, and python lists\n
