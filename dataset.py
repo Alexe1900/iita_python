@@ -2,7 +2,6 @@ import numpy as np
 import numpy.typing as npt
 from typing import Self, List
 import pandas as pd
-import os
 
 class IITA_Dataset():
     #aliases for response_patterns, counterexamples, equiv_examples
