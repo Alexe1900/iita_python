@@ -33,3 +33,30 @@ def read_rp(
         rp = pd.read_table(filename, sep=separator, header=None, na_values=nan_vals)
     
     return rp
+
+class UnionFind():
+    arr = []
+    n = 0
+
+    def __init__(self, n):
+        self.n = n
+        self.arr = list(range(n))
+    
+    def find(self, x):
+        if (self.arr[x] != x): self.arr[x] = self.find(self.arr[x])
+        return self.arr[x]
+    
+    def union(self, x, y):
+        xr = self.find(x)
+        yr = self.find(y)
+
+        self.arr[xr] = yr
+    
+    def get_groups(self):
+        groups = []
+
+        for i in range(self.n): groups.append([])
+        for i in range(self.n):
+            groups[self.find(i)].append(i)
+        
+        return list(filter(len, groups))
