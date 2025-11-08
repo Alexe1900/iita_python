@@ -44,8 +44,8 @@ class IITA_Dataset():
 
         for i in range(len(self.rp)):
             #for respondent i, find all cases where a=0 and b=1 (counterexamples to b->a or a <= b) and increment where they intersect
-            not_a = (self.rp.loc[i] == 1)
-            b = (self.rp.loc[i] == 0)
+            not_a = (self.rp.loc[i] == 0)
+            b = (self.rp.loc[i] == 1)
             self.ce.loc[not_a, b] += 1
         
         #equivalence examples computation   

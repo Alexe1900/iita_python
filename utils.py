@@ -38,9 +38,11 @@ class UnionFind():
     arr = []
     n = 0
 
-    def __init__(self, n):
+    def __init__(self, n: int, arr = None):
         self.n = n
-        self.arr = list(range(n))
+
+        self.arr = arr
+        if (self.arr is None): self.arr = list(range(n))
     
     def find(self, x):
         if (self.arr[x] != x): self.arr[x] = self.find(self.arr[x])
@@ -60,3 +62,6 @@ class UnionFind():
             groups[self.find(i)].append(i)
         
         return list(filter(len, groups))
+    
+    def copy(self):
+        return UnionFind(self.n, self.arr.copy())
