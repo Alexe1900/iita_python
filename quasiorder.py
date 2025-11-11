@@ -1,6 +1,6 @@
 import numpy as np
-from utils import UnionFind
-from iita import unfold_examples
+from .utils import UnionFind
+from .iita import unfold_examples
 
 class QuasiOrder():
     n = None

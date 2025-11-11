@@ -3,7 +3,7 @@ import numpy.typing as npt
 from typing import Self, List
 import pandas as pd
 
-class IITA_Dataset():
+class Dataset():
     #aliases for response_patterns, counterexamples, equiv_examples
     @property
     def rp(self) -> pd.DataFrame:
