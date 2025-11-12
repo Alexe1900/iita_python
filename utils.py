@@ -54,14 +54,18 @@ class UnionFind():
 
         self.arr[xr] = yr
     
-    def get_groups(self):
+    def get_unfiltered_groups(self):
         groups = []
 
         for i in range(self.n): groups.append([])
         for i in range(self.n):
             groups[self.find(i)].append(i)
         
-        return list(filter(len, groups))
+        return groups
+    
+    def get_groups(self):
+        
+        return list(filter(len, self.get_unfiltered_groups()))
     
     def copy(self):
         return UnionFind(self.n, self.arr.copy())

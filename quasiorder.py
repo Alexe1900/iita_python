@@ -1,6 +1,6 @@
 import numpy as np
-from .utils import UnionFind
-from .iita import unfold_examples
+from utils import UnionFind
+from iita import unfold_examples
 
 class QuasiOrder():
     n = None
@@ -87,6 +87,36 @@ def generate_quasi_orders(counterexamples, n):
         queue = np.concat([long_queue, group])
         allow = np.ones(len(queue))
         new_qo = active_qo.copy()
+
+        while (True):
+            new_matrix = active_qo.full_matrix.copy()
+
+            for a, b in queue:
+                new_matrix[a][b] = 1
+            
+            for i, (a, b) in enumerate(queue):
+                ar = active_qo.equiv.find(a)
+                br = active_qo.equiv.find(b)
+
+                if (ar == br):
+                    pass
+
+                if (new_matrix[b][a]):
+                    for x in active_qo.equiv.get_unfiltered_groups()[ar]:
+                        for y in active_qo.equiv.get_unfiltered_groups()[br]:
+                            if (not new_matrix[x][y]):
+                                allow[i] = 0
+                                break
+
+                        if (allow[i] == 0): break
+            
+            if (allow.sum() == len(allow)): break
+
+            long_queue = queue[np.logical_not(allow)].copy()
+            queue = queue[allow.astype(np.bool)].copy()
+            allow = allow[allow.astype(np.bool)].copy()
+        
+        if (len(queue) == 0): continue
 
         while(True):
             new_qo = active_qo.copy()
