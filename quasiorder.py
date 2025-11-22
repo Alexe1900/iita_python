@@ -19,8 +19,7 @@ def ind_gen(counterexamples, n):
     for group in ce:
         new_qo = qos[-1].copy()
         queue = np.concat([group, long_queue], axis=0)
-        # if not sort_queue:
-        #     queue = np.array(sorted(queue.tolist()), dtype=np.int_)
+        queue = np.array(sorted(queue.tolist()), dtype=np.int_)
         allow = np.ones((len(queue)))
 
         for a, b in queue:
