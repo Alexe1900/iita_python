@@ -2,6 +2,26 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 
+class QuasiOrder:
+    def __init__(self, matrix: npt.NDArray):
+        self.full_matrix = matrix
+
+    def get_edge_list(self, buff=0):
+        """
+        Returns the edge list of the quasiorder as a list of (a, b) pairs\n
+        buff: int to add to each index (useful for 1-based indexing)
+        """
+        n = self.full_matrix.shape[0]
+        edge_list = []
+
+        for i in range(n):
+            for j in range(n):
+                if i == j: continue
+                if (self.full_matrix[i][j]):
+                    edge_list.append([i+buff, j+buff])
+        
+        return edge_list
+
 def unfold_examples(
         matrix: pd.DataFrame,
         relativity: npt.NDArray | None = None,
@@ -29,7 +49,11 @@ def unfold_examples(
     res = np.array(list(zip(dfmatrix.to_numpy()[i, j], i, j)), dtype=np.int_)
     return res[res[:, 1] != res[:, 2]]
 
-def ind_gen(counterexamples, n):
+def ind_gen(counterexamples: npt.NDArray, n: int) -> list[QuasiOrder]:
+    """
+    Inductively generates quasiorders from counterexample edge list\n
+    Counterexamples is expected to be of the form returned by unfold_examples (array of (x, i, j) tuples)\n
+    """
     ce = counterexamples
 
     if (len(ce) == 0): raise ValueError("Counterexamples can't be empty")
@@ -73,16 +97,4 @@ def ind_gen(counterexamples, n):
         if (not (qos[-1] == new_qo).all()):
             qos.append(new_qo)
     
-    return qos[1:]
-
-def get_edge_list(qo_matrix, buff=0):
-    n = qo_matrix.shape[0]
-    edge_list = []
-
-    for i in range(n):
-        for j in range(n):
-            if i == j: continue
-            if (qo_matrix[i][j]):
-                edge_list.append([i+buff, j+buff])
-    
-    return edge_list
+    return [QuasiOrder(qo) for qo in qos[1:]]

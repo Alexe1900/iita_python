@@ -2,10 +2,13 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from .dataset import Dataset
-from .quasiorder import get_edge_list
+from .quasiorder import QuasiOrder
 
-def orig_iita_fit(data: Dataset, qo):
-    qo_edges = get_edge_list(qo)
+def orig_iita_fit(data: Dataset, qo: QuasiOrder):
+    """
+    Calculates the original IITA fit metric for a given dataset and quasiorder\n
+    """
+    qo_edges = qo.get_edge_list()
     p = data.rp.to_numpy().sum(axis=0) / data.subjects
 
     error = 0
@@ -20,7 +23,7 @@ def orig_iita_fit(data: Dataset, qo):
         for j in range(data.items):
             if (i == j): continue
 
-            if (qo[i][j]):
+            if (qo.full_matrix[i][j]):
                 expected_ce[i][j] = error * p[j] * data.subjects
             else:
                 expected_ce[i][j] = (1 - p[i]) * p[j] * data.subjects * (1 - error)
