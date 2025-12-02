@@ -7,6 +7,10 @@ class QuasiOrder:
         self.full_matrix = matrix
 
     def get_edge_list(self, buff=0):
+        """
+        Returns the edge list of the quasiorder as a list of (a, b) pairs\n
+        buff: int to add to each index (useful for 1-based indexing)
+        """
         n = self.full_matrix.shape[0]
         edge_list = []
 
@@ -45,7 +49,11 @@ def unfold_examples(
     res = np.array(list(zip(dfmatrix.to_numpy()[i, j], i, j)), dtype=np.int_)
     return res[res[:, 1] != res[:, 2]]
 
-def ind_gen(counterexamples, n) -> list[QuasiOrder]:
+def ind_gen(counterexamples: npt.NDArray, n: int) -> list[QuasiOrder]:
+    """
+    Inductively generates quasiorders from counterexample edge list\n
+    Counterexamples is expected to be of the form returned by unfold_examples (array of (x, i, j) tuples)\n
+    """
     ce = counterexamples
 
     if (len(ce) == 0): raise ValueError("Counterexamples can't be empty")

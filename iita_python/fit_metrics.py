@@ -5,6 +5,9 @@ from .dataset import Dataset
 from .quasiorder import QuasiOrder
 
 def orig_iita_fit(data: Dataset, qo: QuasiOrder):
+    """
+    Calculates the original IITA fit metric for a given dataset and quasiorder\n
+    """
     qo_edges = qo.get_edge_list()
     p = data.rp.to_numpy().sum(axis=0) / data.subjects
 
