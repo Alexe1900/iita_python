@@ -30,8 +30,12 @@ class Dataset():
     equiv_examples = eqe
 
     @property
+    def shape(self):
+        return self.rp.shape
+
+    @property
     def items(self):
-        return self.ce.shape[0]
+        return self.rp.shape[1]
     
     @property
     def subjects(self):

@@ -3,62 +3,29 @@ import numpy.typing as npt
 import pandas as pd
 from .dataset import Dataset
 from .quasiorder import QuasiOrder
+from .fit_segments import *
 
-def orig_iita_fit(data: Dataset, qo: QuasiOrder):
+def iita_decorator(error_rate_calc, expected_ce_calc, compare = avg_squared_diff):
     """
-    Calculates the original IITA fit metric for a given dataset and quasiorder\n
+    A decorator to create IITA fit metric functions with different error rate, expected counterexamples, and comparison calculations\n
+    error_rate has to take Dataset and QuasiOrder as arguments and return a tuple (p, error)\n
+    expected_ce has to take Dataset, QuasiOrder, p and error as arguments and return the expected counterexamples matrix\n
+    compare has to take two matrices and return a fit metric value\n
     """
-    qo_edges = qo.get_edge_list()
-    p = data.rp.to_numpy().sum(axis=0) / data.subjects
+    def calc(data: Dataset, qo: QuasiOrder):
+        p, error = error_rate_calc(data, qo)
 
-    error = 0
-    for a, b in qo_edges:
-        error += data.ce.iloc[a, b] / (p[b] * data.subjects)
+        expected_ce = expected_ce_calc(data, qo, p, error)
+        
+        return compare(data.ce, expected_ce)
     
-    error /= len(qo_edges)
+    return calc
 
-    expected_ce = np.zeros(data.ce.shape)
+orig_iita_fit = iita_decorator(orig_error_rate, orig_expected_ce)
+orig_iita_fit.__doc__ = "Calculates the original IITA fit metric for a given dataset and quasiorder"
 
-    for i in range(data.items):
-        for j in range(data.items):
-            if (i == j): continue
+corr_iita_fit = iita_decorator(orig_error_rate, corr_expected_ce)
+corr_iita_fit.__doc__ = "Calculates the corrected IITA fit metric for a given dataset and quasiorder"
 
-            if (qo.full_matrix[i][j]):
-                expected_ce[i][j] = error * p[j] * data.subjects
-            else:
-                expected_ce[i][j] = (1 - p[i]) * p[j] * data.subjects * (1 - error)
-    
-    ce = data.ce.to_numpy().flatten()
-    expected_ce = expected_ce.flatten()
-    
-    return ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
-
-def corr_iita_fit(data: Dataset, qo: QuasiOrder):
-    """
-    Calculates the corrected IITA fit metric for a given dataset and quasiorder\n
-    """
-    qo_edges = qo.get_edge_list()
-    p = data.rp.to_numpy().sum(axis=0) / data.subjects
-
-    error = 0
-    for a, b in qo_edges:
-        error += data.ce.iloc[a, b] / (p[b] * data.subjects)
-    
-    error /= len(qo_edges)
-
-    expected_ce = np.zeros(data.ce.shape)
-
-    for i in range(data.items):
-        for j in range(data.items):
-            if (i == j): continue
-
-            if (qo.full_matrix[i][j]):
-                expected_ce[i][j] = error * p[j] * data.subjects
-            elif (not qo.full_matrix[j][i]):
-                expected_ce[i][j] = (1 - p[i]) * p[j] * data.subjects
-            else:
-                expected_ce[i][j] = (p[j] * data.subjects) - ((p[i] - p[i] * error) * data.subjects)
-    
-    ce = data.ce.to_numpy().flatten()
-    expected_ce = expected_ce.flatten()
-    return ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
+mini_iita_fit = iita_decorator(mini_error_rate, corr_expected_ce)
+mini_iita_fit.__doc__ = "Calculates the minimized IITA fit metric for a given dataset and quasiorder"
