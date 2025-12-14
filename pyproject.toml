@@ -1,0 +1,10 @@
+[project]
+name = "iita_python"
+readme = "README.md"
+authors = [
+    {name = "Aliaksei Badnarchuk", email = "alexejbodnarchuk@gmail.com"}
+]
+dependencies = [
+    "numpy",
+    "pandas",
+]
