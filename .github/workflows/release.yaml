@@ -67,7 +67,7 @@ jobs:
   setup_and_build:
     needs: [details, check_pypi]
     runs-on: ubuntu-latest
-    steps:
+    steps:      
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -76,7 +76,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      
+
       - name: Install build tools
         run: |
           python -m pip install --upgrade pip
