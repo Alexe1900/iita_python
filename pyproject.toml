@@ -1,10 +1,19 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "iita_python"
+description = "IITA algorithm in python"
 readme = "README.md"
 authors = [
     {name = "Aliaksei Badnarchuk", email = "alexejbodnarchuk@gmail.com"}
 ]
 dependencies = [
     "numpy",
-    "pandas",
+    "pandas"
 ]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "no-local-version"
