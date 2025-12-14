@@ -6,15 +6,11 @@ Intended to replicate the functionality DAKS package from R, with an OOP-style i
 
 ## Installation
 
-### From source (development)
+### From PyPI
 
 ```bash
-git clone https://github.com/Alexe1900/iita_python.git
-cd ./iita_python/
-pip install -e .
+pip install iita_python
 ```
-
-This installs the package in editable mode, so changes to source code are reflected immediately.
 
 ## Quick Start
 
@@ -65,8 +61,8 @@ When reading from a file with `utils.read_rp()`, missing data can be specified v
 Stores response patterns and computes derived metrics:
 
 - `rp`: response patterns (DataFrame)
-- `ce`: counterexamples — pairs (i, j) where subject has item i incorrect but item j correct
-- `eqe`: equivalence examples — pairs (i, j) where subject answered items i and j identically
+- `ce`: counterexamples - pairs (i, j) where subject has item i incorrect but item j correct
+- `eqe`: equivalence examples - pairs (i, j) where subject answered items i and j identically
 - `items`: number of items
 - `subjects`: number of subjects
 - `filled_vals`: number of non-missing responses per item
