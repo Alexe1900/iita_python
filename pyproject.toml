@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "iita_python"
 description = "IITA algorithm in python"
+requires-python = ">=3.9"
 readme = "README.md"
 authors = [
     {name = "Aliaksei Badnarchuk", email = "alexejbodnarchuk@gmail.com"}
