@@ -9,7 +9,7 @@ def orig_iita_fit(data: Dataset, qo: QuasiOrder):
     Calculates the original IITA fit metric for a given dataset and quasiorder\n
     """
     qo_edges = qo.get_edge_list()
-    p = data.rp.to_numpy().nansum(axis=0) / data.subjects
+    p = np.nansum(data.rp.to_numpy(), axis=0) / data.subjects
 
     error = 0
     for a, b in qo_edges:
@@ -38,7 +38,7 @@ def corr_iita_fit(data: Dataset, qo: QuasiOrder):
     Calculates the corrected IITA fit metric for a given dataset and quasiorder\n
     """
     qo_edges = qo.get_edge_list()
-    p = data.rp.to_numpy().nansum(axis=0) / data.subjects
+    p = np.nansum(data.rp.to_numpy(), axis=0) / data.subjects
 
     error = 0
     for a, b in qo_edges:
@@ -67,7 +67,7 @@ def mini_iita_fit(data: Dataset, qo: QuasiOrder):
     """
     Calculates the minimized IITA fit metric for a given dataset and quasiorder\n
     """
-    p = data.rp.to_numpy().nansum(axis=0)
+    p = np.nansum(data.rp.to_numpy(), axis=0)
 
     x = [0, 0, 0, 0]
     for a in range(data.items):
