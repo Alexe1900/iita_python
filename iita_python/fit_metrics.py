@@ -67,7 +67,7 @@ def mini_iita_fit(data: Dataset, qo: QuasiOrder):
     """
     Calculates the minimized IITA fit metric for a given dataset and quasiorder\n
     """
-    p = np.nansum(data.rp.to_numpy(), axis=0)
+    p = np.nansum(data.rp.to_numpy(), axis=0, dtype=np.float64)
 
     x = [0, 0, 0, 0]
     for a in range(data.items):
