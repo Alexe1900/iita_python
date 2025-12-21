@@ -55,7 +55,7 @@ class Dataset():
         self.ce = pd.DataFrame(0, index=np.arange(self.rp.shape[1]), columns=np.arange(self.rp.shape[1]))
 
         for i in range(len(self.rp)):
-            #for subject i, find all cases where a=0 and b=1 (counterexamples to b->a or a <= b) and increment where they intersect
+            #for subject i, increment all cases where a=0 and b=1 (counterexamples to b->a or a <= b)
             not_a = (self.rp.loc[i] == 0)
             b = (self.rp.loc[i] == 1)
             self.ce.loc[not_a, b] += 1
@@ -66,6 +66,12 @@ class Dataset():
             #for subject i, increment all cases where a=b (examples of equivalence of a and b)
             row = self.rp.loc[i].to_numpy()
             self.eqe += np.equal.outer(row, row).astype(int)
+        
+        self.valid_ce_cases = pd.DataFrame(0, index=np.arange(self.rp.shape[1]), columns=np.arange(self.rp.shape[1]))
+        for i in range(len(self.rp)):
+            #for subject i, increment all cases where neither a nor b are NaN (valid case for counterexamples)
+            not_nan = np.logical_not(self.rp.loc[i].isna())
+            self.valid_ce_cases += np.outer(not_nan, not_nan).astype(int)
     
     def add(self, dataset_to_add: Self):
         """
@@ -78,5 +84,12 @@ class Dataset():
         self.rp = pd.concat(self.rp, dataset_to_add.rp)
         self.ce = self.ce + dataset_to_add.ce
         self.eqe = self.eqe + dataset_to_add.eqe
+
+    @property 
+    def relative_ce(self) -> pd.DataFrame:
+        """
+        Returns the counterexamples matrix accounting for missing values
+        """
+        return self.ce / self.valid_ce_cases
     
     __iadd__ = add

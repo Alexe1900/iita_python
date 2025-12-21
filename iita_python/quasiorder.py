@@ -23,30 +23,20 @@ class QuasiOrder:
         return edge_list
 
 def unfold_examples(
-        matrix: pd.DataFrame,
-        relativity: npt.NDArray | None = None,
-        dtype=np.float32
+        matrix: pd.DataFrame
     ) -> npt.NDArray:
     """
     Turns an item/item metric DataFrame into
     a list of tuples of the form (x, [i, j]), where matrix[i, j] = x.\n
-    Can input a relativity matrix, then exery x gets divided by relativity[i, j].
-    This can be used to account for missing values
     """
 
-    dfmatrix = pd.DataFrame(matrix).astype(dtype)
-    
-    rel = relativity
-    if (rel is None):
-        rel = np.ones(dfmatrix.shape, dtype=int)
-    
-    dfmatrix = dfmatrix / rel
+    dfmatrix = pd.DataFrame(matrix)
 
     n = dfmatrix.shape[0]
     pos = np.arange(n, dtype=np.int_)
     i = np.repeat(pos, n)
     j = np.tile(pos, n)
-    res = np.array(list(zip(dfmatrix.to_numpy()[i, j], i, j)), dtype=np.int_)
+    res = np.array(list(zip(dfmatrix.to_numpy()[i, j], i, j)))
     return res[res[:, 1] != res[:, 2]]
 
 def ind_gen(counterexamples: npt.NDArray, n: int) -> list[QuasiOrder]:
