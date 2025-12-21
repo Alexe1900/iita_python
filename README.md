@@ -101,7 +101,7 @@ Returns: float (MSE, lower is better)
 
 ## Testing
 
-See the `test_ipynbs` folder. You can open the Jupyter notebooks in Google Colab and run all cells to see test results.
+See the `testing` branch. You can open the Jupyter notebooks in Google Colab and run all cells to see test results.
 
 I am comparing my results on the PISA dataset to those of Milan Segedinac ([his implementation](https://github.com/milansegedinac/kst))
 
