@@ -31,7 +31,7 @@ class Dataset():
 
     @property
     def items(self):
-        return self.ce.shape[0]
+        return self.rp.shape[1]
     
     @property
     def subjects(self):
@@ -52,23 +52,23 @@ class Dataset():
         self._eqe = None
         
         #counterexamples computation   
-        self.ce = pd.DataFrame(0, index=np.arange(self.rp.shape[1]), columns=np.arange(self.rp.shape[1]))
+        self.ce = pd.DataFrame(0, index=np.arange(self.items), columns=np.arange(self.items))
 
-        for i in range(len(self.rp)):
+        for i in range(self.subjects):
             #for subject i, increment all cases where a=0 and b=1 (counterexamples to b->a or a <= b)
             not_a = (self.rp.loc[i] == 0)
             b = (self.rp.loc[i] == 1)
             self.ce.loc[not_a, b] += 1
         
         #equivalence examples computation   
-        self.eqe = pd.DataFrame(0, index=np.arange(self.rp.shape[1]), columns=np.arange(self.rp.shape[1]))
-        for i in range(len(self.rp)):
+        self.eqe = pd.DataFrame(0, index=np.arange(self.items), columns=np.arange(self.items))
+        for i in range(self.subjects):
             #for subject i, increment all cases where a=b (examples of equivalence of a and b)
             row = self.rp.loc[i].to_numpy()
             self.eqe += np.equal.outer(row, row).astype(int)
-        
-        self.valid_ce_cases = pd.DataFrame(0, index=np.arange(self.rp.shape[1]), columns=np.arange(self.rp.shape[1]))
-        for i in range(len(self.rp)):
+
+        self.valid_ce_cases = pd.DataFrame(0, index=np.arange(self.items), columns=np.arange(self.items))
+        for i in range(self.subjects):
             #for subject i, increment all cases where neither a nor b are NaN (valid case for counterexamples)
             not_nan = np.logical_not(self.rp.loc[i].isna())
             self.valid_ce_cases += np.outer(not_nan, not_nan).astype(int)
@@ -78,7 +78,7 @@ class Dataset():
         Add a second IITA_Dataset: concatenate the response patterns, add counterexamples and equivalence examples\n
         Item amounts must match, else ValueError
         """
-        if (self.rp.shape[1] != dataset_to_add.shape[1]):
+        if (self.items != dataset_to_add.items):
             raise ValueError('Item amounts must match')
         
         self.rp = pd.concat(self.rp, dataset_to_add.rp)
