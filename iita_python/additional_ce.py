@@ -1,24 +1,9 @@
 import numpy as np
 import pandas as pd
+import numpy.typing as npt
+from typing import Self, List
 
-def general_ce(rp: pd.DataFrame) -> pd.DataFrame:
-    """
-    Computes counterexamples from a response pattern DataFrame\n
-    Relies on strict 0/1 values in the response patterns\n
-    Supports missing values in the response patterns by ignoring them\n
-    """
-
-    items = rp.shape[1]
-    subjects = rp.shape[0]
-
-    ce = pd.DataFrame(0, index=np.arange(items), columns=np.arange(items))
-    for i in range(subjects):
-        #for subject i, increment all cases where items a=0 and b=1 (counterexamples to "b implies a" or a <= b)
-        not_a = (rp.loc[i] == 0)
-        b = (rp.loc[i] == 1)
-        ce.loc[not_a, b] += 1
-    
-    return ce
+from iita_python.dataset import Dataset
 
 def pairwise_diff_ce(rp: pd.DataFrame) -> pd.DataFrame:
     """
@@ -91,3 +76,26 @@ def relativify(calculator: callable):
         return ce / valid_cases
 
     return wrapper
+
+class AdditionalCEDataset(Dataset):
+    def __init__(self, response_patterns: pd.DataFrame | npt.NDArray | List[List[int]]):
+        """
+        Computes the counterexamples and equivalence examples from response patterns\n
+        Supports pandas dataframes, numpy arrays, and python lists\n
+        Rows represent the subjects, columns - the items\n
+
+        In addition to the base Dataset, this class provides additional counterexample calculators:\n
+        - pairwise_diff_ce: computes counterexamples using pairwise differences of item correspondences, allowing for non-binary data\n
+        - missing_value_substitution_ce: computes counterexamples using pairwise differences with missing values substituted by item means\n
+        """
+        super().__init__(response_patterns)
+
+        self.pairwise_diff_ce = lambda self, relative=False: (
+            relativify(pairwise_diff_ce) if relative else pairwise_diff_ce
+        )(self.rp)
+        self.pairwise_diff_ce.__doc__ = pairwise_diff_ce.__doc__
+
+        self.missing_value_substitution_ce = lambda self, relative=False: (
+            relativify(missing_value_substitution_ce) if relative else missing_value_substitution_ce
+        )(self.rp)
+        self.missing_value_substitution_ce.__doc__ = missing_value_substitution_ce.__doc__
