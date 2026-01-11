@@ -90,12 +90,10 @@ class AdditionalCEDataset(Dataset):
         """
         super().__init__(response_patterns)
 
-        self.pairwise_diff_ce = lambda self, relative=False: (
-            relativify(pairwise_diff_ce) if relative else pairwise_diff_ce
-        )(self.rp)
+        self.pairwise_diff_ce = lambda: pairwise_diff_ce(self.rp)
         self.pairwise_diff_ce.__doc__ = pairwise_diff_ce.__doc__
 
-        self.missing_value_substitution_ce = lambda self, relative=False: (
+        self.missing_value_substitution_ce = lambda relative=False: (
             relativify(missing_value_substitution_ce) if relative else missing_value_substitution_ce
         )(self.rp)
         self.missing_value_substitution_ce.__doc__ = missing_value_substitution_ce.__doc__
