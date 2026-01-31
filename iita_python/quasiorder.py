@@ -20,31 +20,20 @@ class QuasiOrder:
                 if (self.full_matrix[i][j]):
                     edge_list.append([i+buff, j+buff])
         
-        return edge_list
+        return edge_list   
 
-def unfold_examples(
-        matrix: pd.DataFrame
-    ) -> npt.NDArray:
+def ind_gen(counterexamples: pd.DataFrame, n: int) -> list[QuasiOrder]:
     """
-    Turns an item/item metric DataFrame into
-    a list of tuples of the form (x, [i, j]), where matrix[i, j] = x.\n
+    Inductively generates quasiorders from counterexample count DataFrame\n
     """
 
-    dfmatrix = pd.DataFrame(matrix)
+    dfce = pd.DataFrame(counterexamples)
 
-    n = dfmatrix.shape[0]
+    n = dfce.shape[0]
     pos = np.arange(n, dtype=np.int_)
     i = np.repeat(pos, n)
     j = np.tile(pos, n)
-    res = np.array(list(zip(dfmatrix.to_numpy()[i, j], i, j)))
-    return res[res[:, 1] != res[:, 2]]
-
-def ind_gen(counterexamples: npt.NDArray, n: int) -> list[QuasiOrder]:
-    """
-    Inductively generates quasiorders from counterexample edge list\n
-    Counterexamples is expected to be of the form returned by unfold_examples (array of (x, i, j) tuples)\n
-    """
-    ce = counterexamples
+    ce = np.array(list(zip(dfce.to_numpy()[i, j], i, j)))
 
     if (len(ce) == 0): raise ValueError("Counterexamples can't be empty")
 
