@@ -47,30 +47,30 @@ class Dataset():
         Supports pandas dataframes, numpy arrays, and python lists\n
         Rows represent the subjects, columns - the items\n
         """
-        self._rp = pd.DataFrame(response_patterns, index=None, columns=None)
+        self._rp = pd.DataFrame(response_patterns)
         self._ce = None
         self._eqe = None
         
         #counterexamples computation   
-        self.ce = pd.DataFrame(0, index=np.arange(self.items), columns=np.arange(self.items))
+        self.ce = pd.DataFrame(0, index=self.rp.columns, columns=self.rp.columns)
 
         for i in range(self.subjects):
             #for subject i, increment all cases where a=0 and b=1 (counterexamples to b->a or a <= b)
-            not_a = (self.rp.loc[i] == 0)
-            b = (self.rp.loc[i] == 1)
+            not_a = (self.rp.iloc[i] == 0)
+            b = (self.rp.iloc[i] == 1)
             self.ce.loc[not_a, b] += 1
         
         #equivalence examples computation   
-        self.eqe = pd.DataFrame(0, index=np.arange(self.items), columns=np.arange(self.items))
+        self.eqe = pd.DataFrame(0, index=self.rp.columns, columns=self.rp.columns)
         for i in range(self.subjects):
             #for subject i, increment all cases where a=b (examples of equivalence of a and b)
-            row = self.rp.loc[i].to_numpy()
+            row = self.rp.iloc[i].to_numpy()
             self.eqe += np.equal.outer(row, row).astype(int)
 
-        self.valid_ce_cases = pd.DataFrame(0, index=np.arange(self.items), columns=np.arange(self.items))
+        self.valid_ce_cases = pd.DataFrame(0, index=self.rp.columns, columns=self.rp.columns)
         for i in range(self.subjects):
             #for subject i, increment all cases where neither a nor b are NaN (valid case for counterexamples)
-            not_nan = np.logical_not(self.rp.loc[i].isna())
+            not_nan = np.logical_not(self.rp.iloc[i].isna())
             self.valid_ce_cases += np.outer(not_nan, not_nan).astype(int)
     
     def add(self, dataset_to_add: Self):

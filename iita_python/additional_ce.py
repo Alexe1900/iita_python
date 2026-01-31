@@ -15,12 +15,12 @@ def pairwise_diff_ce(rp: pd.DataFrame) -> pd.DataFrame:
     items = rp.shape[1]
     subjects = rp.shape[0]
 
-    ce = pd.DataFrame(0, index=np.arange(items), columns=np.arange(items))
+    ce = pd.DataFrame(0, index=rp.columns, columns=rp.columns)
     for i in range(subjects):
         # for subject i, if a < b, add b - a for all item pairs (a,b)
         # this is equivalent to ce[a][b] += 1 if a=0 and b=1, but works for non-binary data as well
 
-        row = rp.loc[i].to_numpy()
+        row = rp.iloc[i].to_numpy()
         ce -= np.clip(row[:, None] - row[None, :], None, 0)
 
     return ce
@@ -39,10 +39,10 @@ def missing_value_substitution_ce(rp: pd.DataFrame) -> pd.DataFrame:
 
     for i in range(items):
         # substitute missing values in item i with the mean of the item
-        col = rp1.loc[:, i].to_numpy()
+        col = rp1.iloc[:, i].to_numpy()
         mean_val = np.nanmean(col)
         col = pd.Series(col).fillna(mean_val)
-        rp1.loc[:, i] = col
+        rp1.iloc[:, i] = col
 
     # then calculate pairwise difference counterexamples
     return pairwise_diff_ce(rp1)
@@ -64,10 +64,10 @@ def relativify(calculator: callable):
         items = rp.shape[1]
         subjects = rp.shape[0]
 
-        valid_cases = pd.DataFrame(0, index=np.arange(items), columns=np.arange(items))
+        valid_cases = pd.DataFrame(0, index=rp.columns, columns=rp.columns)
         for i in range(subjects):
             #for subject i, increment all cases where neither a nor b are NaN (valid case for counterexamples)
-            not_nan = np.logical_not(rp.loc[i].isna())
+            not_nan = np.logical_not(rp.iloc[i].isna())
             valid_cases += np.outer(not_nan, not_nan).astype(int)
 
         # avoid division by zero
