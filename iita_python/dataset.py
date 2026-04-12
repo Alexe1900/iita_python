@@ -39,7 +39,7 @@ class Dataset():
     
     @property
     def filled_vals(self):
-        return (~np.isnan(self.rp)).sum(axis=0)
+        return (np.logical_not(np.isnan(self.rp)).astype(int)).sum(axis=0)
 
     def __init__(self, response_patterns: pd.DataFrame | npt.NDArray | List[List[int]]):
         """
@@ -55,7 +55,7 @@ class Dataset():
 
         # setting missing values (NaN) to 0
         rp_no_nan = np.nan_to_num(rp_numpy, 0) # NaN to 0
-        not_rp_no_nan = np.nan_to_num(rp_numpy, 1) # NaN to 1, negated to 0
+        not_rp_no_nan = np.logical_not(np.nan_to_num(rp_numpy, 1)).astype(int) # NaN to 1, negated to 0
 
         # counterexamples computation
         # all cases where a=0 and b=1 (counterexamples to b->a or a <= b)
@@ -68,8 +68,8 @@ class Dataset():
         self.eqe = pd.DataFrame(a_and_b + not_a_and_not_b, index=self.rp.columns, columns=self.rp.columns)
 
         # valid CE cases computation
-        rp_is_nan = np.isnan(rp_numpy)
-        self.valid_ce_cases = pd.DataFrame(~rp_is_nan.T @ ~rp_is_nan, index=self.rp.columns, columns=self.rp.columns)
+        rp_isnt_nan = np.logical_not(np.isnan(rp_numpy)).astype(int)
+        self.valid_ce_cases = pd.DataFrame(rp_isnt_nan.T @ rp_isnt_nan, index=self.rp.columns, columns=self.rp.columns)
     
     def add(self, dataset_to_add: Self):
         """
