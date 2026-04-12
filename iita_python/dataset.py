@@ -43,7 +43,7 @@ class Dataset():
 
     def __init__(self, response_patterns: pd.DataFrame | npt.NDArray | List[List[int]]):
         """
-        Computes the counterexamples and equivalence examples from response patterns\n
+        Computes counterexamples, equivalence examples and valid CE cases from response patterns\n
         Supports pandas dataframes, numpy arrays, and python lists\n
         Rows represent the subjects, columns - the items\n
         """
@@ -51,27 +51,25 @@ class Dataset():
         self._ce = None
         self._eqe = None
         
-        #counterexamples computation   
-        self.ce = pd.DataFrame(0, index=self.rp.columns, columns=self.rp.columns)
+        rp_numpy = self.rp.to_numpy()
 
-        for i in range(self.subjects):
-            #for subject i, increment all cases where a=0 and b=1 (counterexamples to b->a or a <= b)
-            not_a = (self.rp.iloc[i] == 0)
-            b = (self.rp.iloc[i] == 1)
-            self.ce.loc[not_a, b] += 1
+        # setting missing values (NaN) to 0
+        rp_no_nan = np.nan_to_num(rp_numpy, 0) # NaN to 0
+        not_rp_no_nan = np.nan_to_num(rp_numpy, 1) # NaN to 1, negated to 0
+
+        # counterexamples computation
+        # all cases where a=0 and b=1 (counterexamples to b->a or a <= b)
+        self.ce = pd.DataFrame(not_rp_no_nan.T @ rp_no_nan, index=self.rp.columns, columns=self.rp.columns)
         
-        #equivalence examples computation   
-        self.eqe = pd.DataFrame(0, index=self.rp.columns, columns=self.rp.columns)
-        for i in range(self.subjects):
-            #for subject i, increment all cases where a=b (examples of equivalence of a and b)
-            row = self.rp.iloc[i].to_numpy()
-            self.eqe += np.equal.outer(row, row).astype(int)
+        # equivalence examples computation
+        # all cases where a=b, equivalent to ((a and b) or (~a and ~b))
+        a_and_b = rp_no_nan.T @ rp_no_nan
+        not_a_and_not_b = (not_rp_no_nan).T @ (not_rp_no_nan)
+        self.eqe = pd.DataFrame(a_and_b + not_a_and_not_b, index=self.rp.columns, columns=self.rp.columns)
 
-        self.valid_ce_cases = pd.DataFrame(0, index=self.rp.columns, columns=self.rp.columns)
-        for i in range(self.subjects):
-            #for subject i, increment all cases where neither a nor b are NaN (valid case for counterexamples)
-            not_nan = np.logical_not(self.rp.iloc[i].isna())
-            self.valid_ce_cases += np.outer(not_nan, not_nan).astype(int)
+        # valid CE cases computation
+        rp_is_nan = np.isnan(rp_numpy)
+        self.valid_ce_cases = pd.DataFrame(~rp_is_nan.T @ ~rp_is_nan, index=self.rp.columns, columns=self.rp.columns)
     
     def add(self, dataset_to_add: Self):
         """
