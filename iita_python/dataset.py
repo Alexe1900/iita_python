@@ -4,30 +4,27 @@ from typing import Self, List
 import pandas as pd
 
 class Dataset():
-    #aliases for response_patterns, counterexamples, equiv_examples
+    # full name aliases for response patterns, counterexamples and equivalence examples
     @property
-    def rp(self) -> pd.DataFrame:
-        return self._rp
-    @rp.setter
-    def rp(self, inp: pd.DataFrame) -> None:
-        self._rp = inp
-    response_patterns = rp
+    def response_patterns(self) -> pd.DataFrame:
+        return self.rp
+    @response_patterns.setter
+    def response_patterns(self, inp: pd.DataFrame) -> None:
+        self.rp = inp
 
     @property
-    def ce(self) -> pd.DataFrame:
-        return self._ce
-    @ce.setter
-    def ce(self, inp: pd.DataFrame) -> None:
-        self._ce = inp
-    counterexamples = ce
+    def counterexamples(self) -> pd.DataFrame:
+        return self.ce
+    @counterexamples.setter
+    def counterexamples(self, inp: pd.DataFrame) -> None:
+        self.ce = inp
 
     @property
-    def eqe(self) -> pd.DataFrame:
-        return self._eqe
-    @eqe.setter
-    def eqe(self, inp: pd.DataFrame) -> None:
-        self._eqe = inp
-    equiv_examples = eqe
+    def equiv_examples(self) -> pd.DataFrame:
+        return self.eqe
+    @equiv_examples.setter
+    def equiv_examples(self, inp: pd.DataFrame) -> None:
+        self.eqe = inp
 
     @property
     def items(self):
@@ -47,9 +44,9 @@ class Dataset():
         Supports pandas dataframes, numpy arrays, and python lists\n
         Rows represent the subjects, columns - the items\n
         """
-        self._rp = pd.DataFrame(response_patterns)
-        self._ce = None
-        self._eqe = None
+        self.rp = pd.DataFrame(response_patterns)
+        self.ce = None
+        self.eqe = None
         
         rp_numpy = self.rp.to_numpy()
 
@@ -73,7 +70,7 @@ class Dataset():
     
     def add(self, dataset_to_add: Self):
         """
-        Add a second IITA_Dataset: concatenate the response patterns, add counterexamples and equivalence examples\n
+        Add a second IITA_Dataset: concatenate the response patterns, add CE, EQE and valid CE cases\n
         Item amounts must match, else ValueError
         """
         if (self.items != dataset_to_add.items):
@@ -82,6 +79,7 @@ class Dataset():
         self.rp = pd.concat(self.rp, dataset_to_add.rp)
         self.ce = self.ce + dataset_to_add.ce
         self.eqe = self.eqe + dataset_to_add.eqe
+        self.valid_ce_cases = self.valid_ce_cases + dataset_to_add.valid_ce_cases
 
     @property 
     def relative_ce(self) -> pd.DataFrame:
