@@ -21,6 +21,36 @@ class QuasiOrder:
                     edge_list.append([i+buff, j+buff])
         
         return edge_list   
+    
+    def get_knowledge_space(self):
+        """
+        Returns the knowledge space described by the quasiorder as a numpy matrix\n
+        In the output matrix, the rows represent the elements of the knowledge space,
+        and the columns represent the items. An entry is 1 if the item is in the knowledge state, and 0 otherwise.
+        """
+
+        n = self.full_matrix.shape[0]
+
+        bits = 1 << np.arange(n, dtype=object)
+        predecessors = np.array([int(np.packbits(self.full_matrix[:, j], bitorder='little')[0]) | (1 << j) for j in range(n)])
+
+        knowledge_space_set = {0}
+        queue = [0]
+
+        while queue:
+            current = queue.pop()
+
+            absent = (current & bits) == 0
+            candidates = (current | predecessors)[absent]
+
+            for new_set in candidates:
+                if new_set not in knowledge_space_set:
+                    knowledge_space_set.add(new_set)
+                    queue.append(new_set)
+        
+        masks = np.array(sorted(knowledge_space_set), dtype=object)
+        knowledge_space_matrix = ((masks[:, None] & bits) != 0).astype(np.int_)
+        return knowledge_space_matrix
 
 def ind_gen(counterexamples: pd.DataFrame, n: int) -> list[QuasiOrder]:
     """
