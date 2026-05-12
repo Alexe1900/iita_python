@@ -52,7 +52,7 @@ class QuasiOrder:
         knowledge_space_matrix = ((masks[:, None] & bits) != 0).astype(np.int_)
         return knowledge_space_matrix
 
-def ind_gen(counterexamples: pd.DataFrame, n: int) -> list[QuasiOrder]:
+def ind_gen(counterexamples: pd.DataFrame) -> list[QuasiOrder]:
     """
     Inductively generates quasiorders from counterexample count DataFrame\n
     """
@@ -83,6 +83,7 @@ def ind_gen(counterexamples: pd.DataFrame, n: int) -> list[QuasiOrder]:
         queue = np.concat([group, long_queue], axis=0)
         queue = np.array(sorted(queue.tolist()), dtype=np.int_)
         allow = np.ones((len(queue)))
+        long_queue = np.empty((0, 2), dtype=np.int_)
 
         for a, b in queue:
             new_qo[a][b] = 1
@@ -99,7 +100,7 @@ def ind_gen(counterexamples: pd.DataFrame, n: int) -> list[QuasiOrder]:
             
             if (allow.sum() == len(allow)): break
 
-            long_queue = queue[np.logical_not(allow)].copy()
+            long_queue = np.concat((long_queue, queue[np.logical_not(allow)].copy()), axis=0)
             queue = queue[allow.astype(np.bool)].copy()
             allow = allow[allow.astype(np.bool)].copy()
         
