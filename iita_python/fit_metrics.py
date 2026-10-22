@@ -30,8 +30,8 @@ def orig_iita_fit(data: Dataset, qo: QuasiOrder):
     
     ce = data.ce.to_numpy().flatten()
     expected_ce = expected_ce.flatten()
-    
-    return ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
+    mean_squared_error = ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
+    return (mean_squared_error, error)
 
 def corr_iita_fit(data: Dataset, qo: QuasiOrder):
     """
@@ -61,7 +61,8 @@ def corr_iita_fit(data: Dataset, qo: QuasiOrder):
     
     ce = data.ce.to_numpy().flatten()
     expected_ce = expected_ce.flatten()
-    return ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
+    mean_squared_error = ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
+    return (mean_squared_error, error)
 
 def mini_iita_fit(data: Dataset, qo: QuasiOrder):
     """
@@ -100,4 +101,5 @@ def mini_iita_fit(data: Dataset, qo: QuasiOrder):
     
     ce = data.ce.to_numpy().flatten()
     expected_ce = expected_ce.flatten()
-    return ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
+    mean_squared_error = ((ce - expected_ce) ** 2).sum() / (data.items**2 - data.items)
+    return (mean_squared_error, error)
