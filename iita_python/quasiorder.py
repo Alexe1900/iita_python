@@ -3,12 +3,12 @@ import numpy.typing as npt
 import pandas as pd
 
 class QuasiOrder:
-    knowledge_space = None
+    _knowledge_space = None
     full_matrix: np.ndarray
 
     def __init__(self, matrix: np.ndarray, knowledge_space: np.ndarray|None = None):
         self.full_matrix = matrix
-        self.knowledge_space = knowledge_space if knowledge_space is not None else self.get_knowledge_space()
+        self._knowledge_space = knowledge_space
 
     def get_edge_list(self, buff=0):
         """
@@ -24,7 +24,7 @@ class QuasiOrder:
                 if (self.full_matrix[i][j]):
                     edge_list.append([i+buff, j+buff])
         
-        return edge_list   
+        return edge_list
     
     def get_knowledge_space(self, override: bool = False) -> npt.NDArray[np.int_]:
         """
@@ -33,8 +33,8 @@ class QuasiOrder:
         and the columns represent the items. An entry is 1 if the item is in the knowledge state, and 0 otherwise.
         """
 
-        if (self.knowledge_space is not None and not override):
-            return self.knowledge_space
+        if (self._knowledge_space is not None and not override):
+            return self._knowledge_space
 
         n = self.full_matrix.shape[0]
 
@@ -58,10 +58,14 @@ class QuasiOrder:
         masks = np.array(sorted(knowledge_space_set), dtype=object)
         knowledge_space_matrix = ((masks[:, None] & bits) != 0).astype(np.int_)
 
-        if (self.knowledge_space is None or override):
-            self.knowledge_space = knowledge_space_matrix
+        if (self._knowledge_space is None or override):
+            self._knowledge_space = knowledge_space_matrix
 
         return knowledge_space_matrix
+
+    @property
+    def knowledge_space(self):
+        return self.get_knowledge_space()
 
 def ind_gen(counterexamples: pd.DataFrame) -> list[QuasiOrder]:
     """
